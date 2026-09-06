@@ -37,8 +37,24 @@ export const locales: Record<string, Local> = {
     "logo": "🌿",
     "banner": "bg-gradient-to-r from-emerald-800 via-slate-900 to-green-800",
     "categories": [
-      "General"
+      "Productos"
     ],
-    "items": []
+    "items": [
+      {
+        "id": "item-43",
+        "name": "Tomate",
+        "description": "Tomate fresco seleccionado (kg).",
+        "price": 2500,
+        "category": "Productos",
+        "image": "https://api.baqueanonatales.com/media/items/c63bf82a3ac7944d.jpg"
+      },
+      {
+        "id": "item-44",
+        "name": "Palta Hass",
+        "description": "Palta Hass fresco seleccionado (kg).",
+        "price": 5500,
+        "category": "Productos"
+      }
+    ]
   }
 };

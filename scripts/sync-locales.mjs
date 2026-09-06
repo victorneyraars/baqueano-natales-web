@@ -9,7 +9,11 @@ const LOCALES_CONFIG = [
     slug: 'puro-verde',
     tipo: 'comercio',
     tipoLabel: 'Comercio',
+    name: 'Frutería y Verdulería Puro Verde SpA',
     rubro: 'Verdulería y Frutas Frescas',
+    address: 'Avenida Carlos Ibáñez 2116, Puerto Natales',
+    phone: '+56968282130',
+    whatsapp: '56968282130',
     logo: '🌿',
     banner: 'bg-gradient-to-r from-emerald-800 via-slate-900 to-green-800'
   }
@@ -23,7 +27,7 @@ async function sync() {
     try {
       console.log(`📡 Consultando API para local ID ${cfg.id} (${cfg.slug})...`);
       
-      const resCat = await fetch(`${API_BASE}/catalogo/local/${cfg.id}`, { timeout: 10000 });
+      const resCat = await fetch(`${API_BASE}/catalogo/local/${cfg.id}`, { signal: AbortSignal.timeout(10000) });
       if (!resCat.ok) {
         console.warn(`⚠️ No se pudo obtener catálogo para ID ${cfg.id} (Status: ${resCat.status})`);
         continue;
@@ -33,64 +37,63 @@ async function sync() {
       const items = [];
       const categoriesSet = new Set();
 
-      const procesarItem = (it, catNombre) => {
-        if (it.disponible !== false) {
-          const img = it.imagen_url || it.imagen || it.foto || it.url_imagen || null;
-          items.push({
-            id: `item-${it.id}`,
-            name: it.nombre,
-            description: it.descripcion || `${it.nombre} disponible en local.`,
-            price: Number(it.precio) || 0,
-            category: catNombre,
-            image: img && img.startsWith('http') ? img : (img ? `${API_BASE}${img}` : undefined)
-          });
-        }
-      };
-
-      if (Array.isArray(dataCat.categorias)) {
-        for (const cat of dataCat.categorias) {
-          const catNombre = cat.nombre || 'General';
+      // Recorrer dataCat.grupos
+      if (Array.isArray(dataCat.grupos)) {
+        for (const grupo of dataCat.grupos) {
+          const catNombre = (!grupo.nombre || grupo.nombre === 'Sin categoría') ? 'Productos' : grupo.nombre;
           categoriesSet.add(catNombre);
-          if (Array.isArray(cat.items)) {
-            for (const it of cat.items) {
-              procesarItem(it, catNombre);
+
+          if (Array.isArray(grupo.items)) {
+            for (const it of grupo.items) {
+              if (it.disponible !== false) {
+                let img = it.foto_url || (Array.isArray(it.fotos) && it.fotos.length > 0 ? it.fotos[0] : null);
+                if (img && !img.startsWith('http')) {
+                  img = `${API_BASE}${img}`;
+                }
+
+                const desc = it.descripcion && it.descripcion.trim().length > 0
+                  ? it.descripcion
+                  : `${it.nombre} fresco seleccionado${it.unidad ? ` (${it.unidad})` : ''}.`;
+
+                items.push({
+                  id: `item-${it.id}`,
+                  name: it.nombre,
+                  description: desc,
+                  price: Number(it.precio) || 0,
+                  category: catNombre,
+                  image: img || undefined,
+                  tag: it.etiqueta || undefined
+                });
+              }
             }
           }
         }
       }
 
-      if (items.length === 0 && Array.isArray(dataCat.items)) {
-        categoriesSet.add('Productos');
-        for (const it of dataCat.items) {
-          procesarItem(it, 'Productos');
-        }
-      }
-
       const categories = Array.from(categoriesSet);
-      if (categories.length === 0) categories.push('General');
+      if (categories.length === 0) categories.push('Productos');
 
       resultadoLocales[cfg.slug] = {
         slug: cfg.slug,
         tipo: cfg.tipo,
         tipoLabel: cfg.tipoLabel,
-        name: dataCat.local?.razon_social || dataCat.local?.nombre || cfg.slug,
+        name: cfg.name,
         rubro: cfg.rubro,
-        address: dataCat.local?.direccion || 'Puerto Natales',
-        phone: dataCat.local?.telefono || '+56968282130',
-        whatsapp: (dataCat.local?.whatsapp || dataCat.local?.telefono || '56968282130').replace(/\D/g, ''),
+        address: cfg.address,
+        phone: cfg.phone,
+        whatsapp: cfg.whatsapp,
         logo: cfg.logo,
         banner: cfg.banner,
         categories: categories,
         items: items
       };
 
-      console.log(`✅ Sincronizado ${cfg.slug}: ${items.length} productos.`);
+      console.log(`✅ Sincronizado ${cfg.slug}: ${items.length} productos detectados con éxito.`);
     } catch (err) {
-      console.warn(`⚠️ Error consultando API para ${cfg.slug} (usando caché previa si existe):`, err.message);
+      console.warn(`⚠️ Error consultando API para ${cfg.slug}:`, err.message);
     }
   }
 
-  // Si se obtuvieron datos válidos, actualizar menus.ts
   if (Object.keys(resultadoLocales).length > 0) {
     const fileContent = `// Archivo autogenerado via scripts/sync-locales.mjs
 export interface MenuItem {
@@ -121,9 +124,7 @@ export interface Local {
 export const locales: Record<string, Local> = ${JSON.stringify(resultadoLocales, null, 2)};
 `;
     fs.writeFileSync(path.resolve('src/data/menus.ts'), fileContent, 'utf8');
-    console.log(`🎉 Archivo src/data/menus.ts actualizado.`);
-  } else {
-    console.log(`ℹ️ Manteniendo datos existentes en src/data/menus.ts.`);
+    console.log(`🎉 Archivo src/data/menus.ts actualizado con los productos y fotos de la API.`);
   }
 }
 
