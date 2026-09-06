@@ -80,5 +80,32 @@ export const restaurants: Record<string, Restaurant> = {
         category: "Bebidas & Vinos"
       }
     ]
+  },
+  "puro-verde": {
+    slug: "puro-verde",
+    name: "Frutería y Verdulería Puro Verde SpA",
+    type: "Verdulería y Frutas Frescas",
+    address: "Avenida Carlos Ibáñez 2116, Puerto Natales",
+    phone: "+56968282130",
+    whatsapp: "56968282130",
+    logo: "🌿",
+    banner: "bg-gradient-to-r from-emerald-800 via-slate-900 to-green-800",
+    categories: ["Frutas y Verduras"],
+    items: [
+      {
+        id: "pv-43",
+        name: "Tomate",
+        description: "Tomates frescos seleccionados de primera calidad (unidad/kg).",
+        price: 2500,
+        category: "Frutas y Verduras"
+      },
+      {
+        id: "pv-44",
+        name: "Palta Hass",
+        description: "Palta Hass madura, de gran sabor e ideal para consumo inmediato (unidad/kg).",
+        price: 5500,
+        category: "Frutas y Verduras"
+      }
+    ]
   }
 };
