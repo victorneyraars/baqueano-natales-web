@@ -1,0 +1,50 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { locales } from '../../data/menus';
+
+const listaLocales = Object.values(locales);
+---
+
+<Layout title="Locales y Comercios | Baqueano Natales">
+  <main class="min-h-screen bg-slate-950 text-slate-100 pb-24">
+    <!-- Encabezado -->
+    <header class="border-b border-emerald-500/20 bg-slate-900/60 p-6 pt-12 text-center">
+      <h1 class="text-2xl font-black tracking-tight text-white mb-1">Locales Asociados</h1>
+      <p class="text-xs text-slate-400">Descubre los comercios, gastronomía y servicios en Puerto Natales</p>
+    </header>
+
+    <div class="max-w-md mx-auto px-4 py-6 space-y-4">
+      {listaLocales.map((local) => (
+        <a 
+          href={`/locales/${local.tipo}/${local.slug}`}
+          class="block p-4 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-all group"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">{local.logo}</span>
+              <div>
+                <h2 class="font-bold text-slate-100 text-base group-hover:text-emerald-400 transition-colors">
+                  {local.name}
+                </h2>
+                <p class="text-xs text-emerald-400 font-medium">{local.rubro}</p>
+              </div>
+            </div>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
+              {local.tipoLabel}
+            </span>
+          </div>
+
+          <p class="text-xs text-slate-400 flex items-center gap-1 mt-3 pt-3 border-t border-slate-800/60">
+            📍 {local.address}
+          </p>
+        </a>
+      ))}
+
+      <!-- Pie informativo -->
+      <footer class="mt-12 text-center text-xs text-slate-500 space-y-1">
+        <p>Red Baqueano Natales</p>
+        <p class="text-[11px]">Tecnología desarrollada por Studio Digital 360</p>
+      </footer>
+    </div>
+  </main>
+</Layout>

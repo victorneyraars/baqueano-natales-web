@@ -44,7 +44,7 @@ const { local } = Astro.props;
         <div>
           <span class="text-[10px] font-bold tracking-wider uppercase text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">Atención Directa</span>
           <p class="text-xs font-semibold text-slate-200 mt-1">Los pedidos se procesan por la App</p>
-          <p class="text-[11px] text-slate-400">Tu orden se coordina directo con el local.</p>
+          <p class="text-[11px] text-slate-400">Tu orden se coordina directo con el comercio.</p>
         </div>
         <a href={`https://wa.me/${local.whatsapp}`} target="_blank" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition-colors">
           Abrir App
@@ -75,10 +75,10 @@ const { local } = Astro.props;
       </div>
 
       <!-- Footer informativo -->
-      <div class="mt-12 text-center text-xs text-slate-400 space-y-1">
+      <footer class="mt-12 text-center text-xs text-slate-500 space-y-1">
         <p>Catálogo Digital de Comercio · Red Baqueano Natales</p>
-        <p class="text-[11px] text-slate-400">Tecnología desarrollada por Studio Digital 360</p>
-      </div>
+        <p class="text-[11px]">Tecnología desarrollada por Studio Digital 360</p>
+      </footer>
     </div>
   </main>
 </Layout>
