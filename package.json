@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "build": "node scripts/sync-locales.mjs && astro build",
+    "preview": "astro preview",
+    "sync": "node scripts/sync-locales.mjs"
   },
   "dependencies": {
     "astro": "^5.0.0"

@@ -1,3 +1,4 @@
+// Archivo autogenerado via scripts/sync-locales.mjs
 export interface MenuItem {
   id: string;
   name: string;
@@ -25,32 +26,19 @@ export interface Local {
 
 export const locales: Record<string, Local> = {
   "puro-verde": {
-    slug: "puro-verde",
-    tipo: "comercio",
-    tipoLabel: "Comercio",
-    name: "Frutería y Verdulería Puro Verde SpA",
-    rubro: "Verdulería y Frutas Frescas",
-    address: "Avenida Carlos Ibáñez 2116, Puerto Natales",
-    phone: "+56968282130",
-    whatsapp: "56968282130",
-    logo: "🌿",
-    banner: "bg-gradient-to-r from-emerald-800 via-slate-900 to-green-800",
-    categories: ["Frutas y Verduras"],
-    items: [
-      {
-        id: "pv-43",
-        name: "Tomate",
-        description: "Tomates frescos seleccionados de primera calidad (unidad/kg).",
-        price: 2500,
-        category: "Frutas y Verduras"
-      },
-      {
-        id: "pv-44",
-        name: "Palta Hass",
-        description: "Palta Hass madura, de gran sabor e ideal para consumo inmediato (unidad/kg).",
-        price: 5500,
-        category: "Frutas y Verduras"
-      }
-    ]
+    "slug": "puro-verde",
+    "tipo": "comercio",
+    "tipoLabel": "Comercio",
+    "name": "Frutería y Verdulería Puro Verde SpA",
+    "rubro": "Verdulería y Frutas Frescas",
+    "address": "Avenida Carlos Ibáñez 2116, Puerto Natales",
+    "phone": "+56968282130",
+    "whatsapp": "56968282130",
+    "logo": "🌿",
+    "banner": "bg-gradient-to-r from-emerald-800 via-slate-900 to-green-800",
+    "categories": [
+      "General"
+    ],
+    "items": []
   }
 };
