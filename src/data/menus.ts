@@ -8,10 +8,11 @@ export interface MenuItem {
   tag?: string;
 }
 
-export interface Restaurant {
+export interface Local {
   slug: string;
+  tipo: "comercio" | "gastronomia" | "servicios";
   name: string;
-  type: string;
+  rubro: string;
   address: string;
   phone: string;
   whatsapp: string;
@@ -21,11 +22,12 @@ export interface Restaurant {
   items: MenuItem[];
 }
 
-export const restaurants: Record<string, Restaurant> = {
+export const locales: Record<string, Local> = {
   "puro-verde": {
     slug: "puro-verde",
+    tipo: "comercio",
     name: "Frutería y Verdulería Puro Verde SpA",
-    type: "Verdulería y Frutas Frescas",
+    rubro: "Verdulería y Frutas Frescas",
     address: "Avenida Carlos Ibáñez 2116, Puerto Natales",
     phone: "+56968282130",
     whatsapp: "56968282130",

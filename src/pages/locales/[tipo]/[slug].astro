@@ -1,0 +1,84 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { locales } from '../../../data/menus';
+
+export function getStaticPaths() {
+  return Object.values(locales).map((local) => ({
+    params: { tipo: local.tipo, slug: local.slug },
+    props: { local },
+  }));
+}
+
+const { local } = Astro.props;
+---
+
+<Layout title={`${local.name} | Catálogo Baqueano`}>
+  <main class="min-h-screen bg-slate-950 text-slate-100 pb-24">
+    <!-- Banner Principal -->
+    <div class={`${local.banner} p-6 pt-12 pb-8 border-b border-emerald-500/20`}>
+      <div class="max-w-md mx-auto text-center">
+        <div class="text-5xl mb-3">{local.logo}</div>
+        <h1 class="text-2xl font-black tracking-tight text-white mb-1">{local.name}</h1>
+        <p class="text-sm font-medium text-emerald-400 mb-2">{local.rubro}</p>
+        <p class="text-xs text-slate-300 flex items-center justify-center gap-1">
+          📍 {local.address}
+        </p>
+      </div>
+    </div>
+
+    <div class="max-w-md mx-auto px-4 py-6">
+      <!-- Filtros de Categorías -->
+      <div class="flex gap-2 overflow-x-auto pb-4 mb-4 scrollbar-none">
+        <button class="px-4 py-2 rounded-full text-xs font-semibold bg-emerald-500 text-slate-950 whitespace-nowrap shadow-lg shadow-emerald-500/20">
+          Todos los Productos
+        </button>
+        {local.categories.map((cat) => (
+          <button class="px-4 py-2 rounded-full text-xs font-medium bg-slate-900 border border-slate-800 text-slate-400 whitespace-nowrap">
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      <!-- Alerta Atención Directa -->
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-emerald-500/20 mb-6 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold tracking-wider uppercase text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">Atención Directa</span>
+          <p class="text-xs font-semibold text-slate-200 mt-1">Los pedidos se procesan por la App</p>
+          <p class="text-[11px] text-slate-400">Tu orden se coordina directo con el local.</p>
+        </div>
+        <a href={`https://wa.me/${local.whatsapp}`} target="_blank" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition-colors">
+          Abrir App
+        </a>
+      </div>
+
+      <!-- Lista de Items -->
+      <div class="space-y-3">
+        {local.items.map((item) => (
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-colors">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <h3 class="font-bold text-slate-100 text-base">{item.name}</h3>
+                <p class="text-xs text-slate-400 mt-0.5">{item.description}</p>
+              </div>
+              <span class="font-black text-emerald-400 text-base shrink-0 ml-2">
+                ${item.price.toLocaleString('es-CL')}
+              </span>
+            </div>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800/60 mt-2">
+              <span class="text-[10px] text-slate-400">{item.category}</span>
+              <a href={`https://wa.me/${local.whatsapp}?text=Hola!%20Quiero%20pedir%20${encodeURIComponent(item.name)}`} target="_blank" class="px-3 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-semibold transition-all">
+                Pedir en la App 📲
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Footer informativo -->
+      <div class="mt-12 text-center text-xs text-slate-400 space-y-1">
+        <p>Catálogo Digital de Comercio · Red Baqueano Natales</p>
+        <p class="text-[11px] text-slate-400">Tecnología desarrollada por Studio Digital 360</p>
+      </div>
+    </div>
+  </main>
+</Layout>
