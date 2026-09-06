@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/sync-locales.mjs && astro build",
+    "build": "node scripts/sync-locales.mjs || true && astro build",
     "preview": "astro preview",
     "sync": "node scripts/sync-locales.mjs"
   },

@@ -51,18 +51,26 @@ const { local } = Astro.props;
         </a>
       </div>
 
-      <!-- Lista de Items -->
+      <!-- Lista de Items con soporte para Imagen -->
       <div class="space-y-3">
         {local.items.map((item) => (
           <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-colors">
-            <div class="flex justify-between items-start mb-2">
-              <div>
+            <div class="flex justify-between items-start gap-3 mb-2">
+              <div class="flex-1">
                 <h3 class="font-bold text-slate-100 text-base">{item.name}</h3>
                 <p class="text-xs text-slate-400 mt-0.5">{item.description}</p>
+                <div class="mt-2 font-black text-emerald-400 text-base">
+                  ${item.price.toLocaleString('es-CL')}
+                </div>
               </div>
-              <span class="font-black text-emerald-400 text-base shrink-0 ml-2">
-                ${item.price.toLocaleString('es-CL')}
-              </span>
+              {item.image && (
+                <img 
+                  src={item.image} 
+                  alt={item.name} 
+                  class="w-20 h-20 object-cover rounded-lg border border-slate-800 bg-slate-950 shrink-0" 
+                  loading="lazy"
+                />
+              )}
             </div>
             <div class="flex justify-between items-center pt-2 border-t border-slate-800/60 mt-2">
               <span class="text-[10px] text-slate-400">{item.category}</span>
