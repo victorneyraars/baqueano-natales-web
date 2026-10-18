@@ -8,6 +8,7 @@
     "sync": "node scripts/sync-locales.mjs"
   },
   "dependencies": {
+    "@astrojs/vercel": "^9.0.5",
     "astro": "^5.0.0"
   },
   "devDependencies": {
