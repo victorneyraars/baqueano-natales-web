@@ -20,8 +20,7 @@ try {
     fetchPrestadores(),
     fetchCategoriasOficio(),
   ]);
-  // Solo mostrar verificados con datos completos
-  // (evita crashes si un prestador tiene categoria o especialidades null)
+  // Filtrar verificados con datos completos (evita crashes con datos null)
   prestadores = dataPrest.items.filter(
     (p) => p.verificado && p.categoria && Array.isArray(p.especialidades),
   );
@@ -29,12 +28,6 @@ try {
   categorias = dataCats;
 } catch {
   errorMsg = 'No se pudo cargar el listado de prestadores.';
-}
-
-const url = Astro.url;
-const catParam = url.searchParams.get('categoria');
-if (catParam) {
-  prestadores = prestadores.filter((p) => p.categoria.slug === catParam);
 }
 ---
 
@@ -47,11 +40,9 @@ if (catParam) {
       <p class="text-xs text-slate-400">
         Encuentra mecánicos, gasfiteros, electricistas y más en Puerto Natales
       </p>
-      {total > 0 && (
-        <p class="text-[10px] text-emerald-400 mt-2 font-semibold">
-          {total} {total === 1 ? 'profesional verificado' : 'profesionales verificados'}
-        </p>
-      )}
+      <p id="contador-prestadores" class="text-[10px] text-emerald-400 mt-2 font-semibold">
+        {total} {total === 1 ? 'profesional verificado' : 'profesionales verificados'}
+      </p>
     </header>
 
     <div class="max-w-4xl mx-auto px-4 py-6">
@@ -61,26 +52,21 @@ if (catParam) {
         </div>
       )}
 
+      <!-- Chips de filtro (data-chip = slug de categoría) -->
       {categorias.length > 0 && (
         <div class="flex flex-wrap gap-2 mb-6">
           <a
             href="/prestadores"
-            class={`px-3 py-1.5 rounded-full text-xs font-bold transition ${
-              !catParam
-                ? 'bg-emerald-500 text-slate-950'
-                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:border-emerald-500/40'
-            }`}
+            data-chip=""
+            class="px-3 py-1.5 rounded-full text-xs font-bold transition bg-emerald-500 text-slate-950"
           >
             Todos
           </a>
           {categorias.map((cat) => (
             <a
               href={`/prestadores?categoria=${cat.slug}`}
-              class={`px-3 py-1.5 rounded-full text-xs font-bold transition ${
-                catParam === cat.slug
-                  ? 'bg-emerald-500 text-slate-950'
-                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:border-emerald-500/40'
-              }`}
+              data-chip={cat.slug}
+              class="px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-900 border border-slate-800 text-slate-400 hover:border-emerald-500/40"
             >
               {cat.nombre}
             </a>
@@ -88,20 +74,32 @@ if (catParam) {
         </div>
       )}
 
-      {prestadores.length === 0 && !errorMsg && (
-        <div class="text-center py-16">
-          <p class="text-4xl mb-3">🔧</p>
-          <p class="text-slate-400 text-sm">No hay prestadores disponibles todavía.</p>
-          <p class="text-slate-500 text-xs mt-1">Vuelve pronto.</p>
-        </div>
-      )}
+      <!-- Empty state para categoría sin resultados -->
+      <div
+        id="empty-filtro"
+        class="hidden text-center py-16"
+      >
+        <p class="text-4xl mb-3">🔍</p>
+        <p class="text-slate-400 text-sm">
+          No hay prestadores en esta categoría todavía.
+        </p>
+        <a
+          href="/prestadores"
+          class="inline-block mt-4 text-emerald-400 text-xs font-bold hover:underline"
+        >
+          Ver todos los oficios
+        </a>
+      </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Grid de prestadores (data-card-cat = slug de categoría) -->
+      <div id="prestadores-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {prestadores.map((p) => (
           <a
             href={`/prestadores/${p.slug}`}
-            class="block bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/40 transition-all group"
+            data-card-cat={p.categoria.slug}
+            class="prestador-card block bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/40 transition-all group"
           >
+            <!-- Portada -->
             <div class="relative h-32 bg-gradient-to-br from-emerald-900 to-slate-950">
               {p.foto_portada_url ? (
                 <img
@@ -122,6 +120,7 @@ if (catParam) {
               )}
             </div>
 
+            <!-- Info -->
             <div class="p-4">
               <div class="flex items-start gap-3 mb-2">
                 {p.foto_url ? (
@@ -157,7 +156,7 @@ if (catParam) {
 
               <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
                 <span class="text-[11px] text-slate-400">
-                  {p.anios_experiencia ? `${p.anios_experiencia} años exp.` : '—'}
+                  {p.anios_experiencia ? `${p.anios_experiencia} años exp.` : 'Sin info'}
                 </span>
                 <span class="text-[10px] font-bold text-amber-400">
                   ★ {Number(p.calificacion_promedio).toFixed(1)} ({p.total_resenas})
@@ -193,3 +192,70 @@ if (catParam) {
     </div>
   </main>
 </Layout>
+
+<script>
+  // ============================================================
+  // Filtro client-side (compatible con ISR cacheado en Vercel)
+  // El HTML se cachea igual; el JS lee window.location.search
+  // y aplica el filtro visualmente.
+  // ============================================================
+
+  const CLASES_CHIP_ACTIVO = 'px-3 py-1.5 rounded-full text-xs font-bold transition bg-emerald-500 text-slate-950';
+  const CLASES_CHIP_INACTIVO = 'px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-900 border border-slate-800 text-slate-400 hover:border-emerald-500/40';
+
+  function aplicarFiltro() {
+    const filtro = new URLSearchParams(window.location.search).get('categoria');
+    const cards = document.querySelectorAll<HTMLElement>('[data-card-cat]');
+    const chips = document.querySelectorAll<HTMLElement>('[data-chip]');
+    const contador = document.getElementById('contador-prestadores');
+    const empty = document.getElementById('empty-filtro');
+
+    let visibles = 0;
+    cards.forEach((card) => {
+      const cat = card.dataset.cardCat;
+      const visible = !filtro || cat === filtro;
+      card.style.display = visible ? '' : 'none';
+      if (visible) visibles++;
+    });
+
+    chips.forEach((chip) => {
+      const chipCat = chip.dataset.chip;
+      const activo = (!filtro && !chipCat) || (filtro === chipCat);
+      chip.className = activo ? CLASES_CHIP_ACTIVO : CLASES_CHIP_INACTIVO;
+    });
+
+    if (contador) {
+      if (filtro) {
+        contador.textContent = visibles === 1
+          ? '1 profesional en esta categoría'
+          : `${visibles} profesionales en esta categoría`;
+      } else {
+        const total = cards.length;
+        contador.textContent = total === 1
+          ? '1 profesional verificado'
+          : `${total} profesionales verificados`;
+      }
+    }
+
+    if (empty) {
+      empty.style.display = visibles === 0 ? 'block' : 'none';
+    }
+  }
+
+  // Aplicar al cargar
+  aplicarFiltro();
+
+  // Back/forward del navegador
+  window.addEventListener('popstate', aplicarFiltro);
+
+  // Interceptar clicks en chips (pushState = sin recarga)
+  document.querySelectorAll<HTMLElement>('[data-chip]').forEach((chip) => {
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      const cat = chip.dataset.chip;
+      const url = cat ? `/prestadores?categoria=${cat}` : '/prestadores';
+      window.history.pushState({}, '', url);
+      aplicarFiltro();
+    });
+  });
+</script>
