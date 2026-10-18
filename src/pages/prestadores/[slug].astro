@@ -13,6 +13,11 @@ export const prerender = false;
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/prestadores');
 
+// Redirect 301: slug viejo del rename a "Se Alquila Marido"
+if (slug === 'taller-mecanico-del-sur') {
+  return Astro.redirect('/prestadores/se-alquila-marido', 301);
+}
+
 // 2 requests en paralelo: detalle + reviews (el endpoint de detalle no los incluye)
 const [prestador, reviews] = await Promise.all([
   fetchPrestadorPorSlug(slug),
