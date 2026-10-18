@@ -1,0 +1,263 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import {
+  fetchPrestadorPorSlug,
+  fetchReviewsPrestador,
+  formatearPrecio,
+  nombreEspecialidad,
+  type Review,
+} from '../../config/api';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/prestadores');
+
+// 2 requests en paralelo: detalle + reviews (el endpoint de detalle no los incluye)
+const [prestador, reviews] = await Promise.all([
+  fetchPrestadorPorSlug(slug),
+  fetchReviewsPrestador(slug),
+]);
+
+if (!prestador) return Astro.redirect('/prestadores');
+
+const whatsappLink = prestador.whatsapp
+  ? `https://wa.me/${prestador.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(
+      `Hola! Quiero consultar sobre servicios de ${prestador.nombre}`,
+    )}`
+  : null;
+
+// JSON-LD para SEO local (Google recomienda LocalBusiness schema)
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: prestador.nombre,
+  description: prestador.descripcion,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: prestador.comuna,
+    addressRegion: prestador.region,
+  },
+  telephone: prestador.telefono,
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: prestador.calificacion_promedio,
+    reviewCount: prestador.total_resenas,
+  },
+};
+---
+
+<Layout title={`${prestador.nombre} | Oficios Baqueano`}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <main class="min-h-screen bg-slate-950 text-slate-100 pb-24">
+    <!-- Hero -->
+    <div class="relative h-56 bg-gradient-to-br from-emerald-900 via-slate-900 to-emerald-950 overflow-hidden">
+      {prestador.foto_portada_url && (
+        <img
+          src={prestador.foto_portada_url}
+          alt={prestador.nombre}
+          class="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+      )}
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+
+      <div class="relative max-w-2xl mx-auto px-4 pt-8 flex items-end gap-4 h-full pb-4">
+        {prestador.foto_url ? (
+          <img
+            src={prestador.foto_url}
+            alt={prestador.nombre}
+            class="w-20 h-20 rounded-2xl object-cover border-4 border-slate-950 shadow-2xl shrink-0"
+          />
+        ) : (
+          <div class="w-20 h-20 rounded-2xl bg-emerald-950 border-4 border-slate-950 flex items-center justify-center text-4xl shrink-0">
+            🔧
+          </div>
+        )}
+        <div class="flex-1 min-w-0 pb-1">
+          <h1 class="text-2xl font-black text-white leading-tight mb-1">
+            {prestador.nombre}
+          </h1>
+          <p class="text-xs text-emerald-400 font-semibold">
+            {prestador.categoria.nombre}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-2xl mx-auto px-4 py-6">
+      <!-- Stats -->
+      <div class="grid grid-cols-3 gap-2 mb-6">
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center">
+          <p class="text-2xl font-black text-amber-400">
+            ★ {Number(prestador.calificacion_promedio).toFixed(1)}
+          </p>
+          <p class="text-[10px] text-slate-500 uppercase font-bold">
+            {prestador.total_resenas} reseñas
+          </p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center">
+          <p class="text-2xl font-black text-emerald-400">
+            {prestador.anios_experiencia ?? '—'}
+          </p>
+          <p class="text-[10px] text-slate-500 uppercase font-bold">Años exp.</p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center">
+          <p class="text-2xl font-black text-blue-400">
+            {prestador.verificado ? '✓' : '—'}
+          </p>
+          <p class="text-[10px] text-slate-500 uppercase font-bold">Verificado</p>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      {prestador.descripcion && (
+        <section class="mb-6">
+          <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+            Sobre el profesional
+          </h2>
+          <p class="text-sm text-slate-300 leading-relaxed">{prestador.descripcion}</p>
+        </section>
+      )}
+
+      <!-- Especialidades -->
+      {prestador.especialidades.length > 0 && (
+        <section class="mb-6">
+          <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+            Especialidades
+          </h2>
+          <div class="flex flex-wrap gap-2">
+            {prestador.especialidades.map((esp) => (
+              <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-300">
+                {nombreEspecialidad(esp)}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Servicios -->
+      {prestador.servicios.length > 0 && (
+        <section class="mb-6">
+          <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+            Servicios
+          </h2>
+          <div class="space-y-2">
+            {prestador.servicios.map((s) => (
+              <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex justify-between items-center">
+                <div>
+                  <p class="text-sm font-bold text-slate-200">{s.nombre}</p>
+                  {s.descripcion && (
+                    <p class="text-[11px] text-slate-400">{s.descripcion}</p>
+                  )}
+                </div>
+                <span class="text-sm font-bold text-emerald-400 shrink-0 ml-4">
+                  {s.precio_desde_clp
+                    ? `Desde ${formatearPrecio(s.precio_desde_clp)}`
+                    : 'Consultar'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Ubicación -->
+      <section class="mb-6">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+          Ubicación
+        </h2>
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+          <p class="text-sm text-slate-200">
+            📍 {prestador.direccion ?? prestador.comuna}
+          </p>
+          <p class="text-xs text-slate-500 mt-1">
+            {prestador.comuna}, {prestador.region}
+          </p>
+        </div>
+      </section>
+
+      <!-- Contacto -->
+      <section class="mb-6">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+          Contacto
+        </h2>
+        <div class="space-y-2">
+          {whatsappLink && (
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors group"
+            >
+              <span class="text-sm font-bold text-emerald-400">
+                Contactar por WhatsApp
+              </span>
+              <span class="text-emerald-400 group-hover:translate-x-1 transition-transform">
+                →
+              </span>
+            </a>
+          )}
+          {prestador.telefono && (
+            <a
+              href={`tel:${prestador.telefono}`}
+              class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-colors"
+            >
+              <span class="text-sm text-slate-300">📞 {prestador.telefono}</span>
+            </a>
+          )}
+        </div>
+      </section>
+
+      <!-- Reviews (desde el 2do request) -->
+      {reviews.length > 0 && (
+        <section class="mb-6">
+          <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+            Reseñas
+          </h2>
+          <div class="space-y-3">
+            {reviews.map((r: Review) => (
+              <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-amber-400 text-xs font-bold">
+                    {'★'.repeat(r.rating)}
+                    {'☆'.repeat(5 - r.rating)}
+                  </span>
+                  <span class="text-[10px] text-slate-500">
+                    {r.cliente_nombre ?? 'Cliente'}
+                  </span>
+                </div>
+                {r.comentario && (
+                  <p class="text-xs text-slate-300 mt-1">{r.comentario}</p>
+                )}
+                {r.respuesta_prestador && (
+                  <div class="mt-2 pl-3 border-l-2 border-emerald-500/30">
+                    <p class="text-[10px] text-emerald-400 font-bold">
+                      Respuesta del prestador:
+                    </p>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                      {r.respuesta_prestador}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- CTA volver -->
+      <a
+        href="/prestadores"
+        class="block text-center p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-colors text-sm text-slate-300 font-medium"
+      >
+        ← Volver al listado
+      </a>
+
+      <footer class="mt-8 text-center text-xs text-slate-500 space-y-1">
+        <p>Red Baqueano Natales · Oficios</p>
+        <p class="text-[11px]">Tecnología desarrollada por Studio Digital 360</p>
+      </footer>
+    </div>
+  </main>
+</Layout>

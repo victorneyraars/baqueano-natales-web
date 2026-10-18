@@ -1,0 +1,192 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import {
+  fetchPrestadores,
+  fetchCategoriasOficio,
+  nombreEspecialidad,
+  type PrestadorListItem,
+  type Categoria,
+} from '../../config/api';
+
+export const prerender = false;
+
+let prestadores: PrestadorListItem[] = [];
+let categorias: Categoria[] = [];
+let total = 0;
+let errorMsg: string | null = null;
+
+try {
+  const [dataPrest, dataCats] = await Promise.all([
+    fetchPrestadores(),
+    fetchCategoriasOficio(),
+  ]);
+  // Solo mostrar verificados (los no verificados son drafts o pruebas)
+  prestadores = dataPrest.items.filter((p) => p.verificado);
+  total = prestadores.length;
+  categorias = dataCats;
+} catch {
+  errorMsg = 'No se pudo cargar el listado de prestadores.';
+}
+
+const url = Astro.url;
+const catParam = url.searchParams.get('categoria');
+if (catParam) {
+  prestadores = prestadores.filter((p) => p.categoria.slug === catParam);
+}
+---
+
+<Layout title="Oficios y Servicios | Baqueano Natales">
+  <main class="min-h-screen bg-slate-950 text-slate-100 pb-24">
+    <header class="border-b border-emerald-500/20 bg-slate-900/60 p-6 pt-12 text-center">
+      <h1 class="text-2xl font-black tracking-tight text-white mb-1">
+        Oficios y Servicios
+      </h1>
+      <p class="text-xs text-slate-400">
+        Encuentra mecánicos, gasfiteros, electricistas y más en Puerto Natales
+      </p>
+      {total > 0 && (
+        <p class="text-[10px] text-emerald-400 mt-2 font-semibold">
+          {total} {total === 1 ? 'profesional verificado' : 'profesionales verificados'}
+        </p>
+      )}
+    </header>
+
+    <div class="max-w-4xl mx-auto px-4 py-6">
+      {errorMsg && (
+        <div class="p-4 rounded-xl bg-red-950/40 border border-red-500/30 mb-4">
+          <p class="text-xs text-red-300">{errorMsg}</p>
+        </div>
+      )}
+
+      {categorias.length > 0 && (
+        <div class="flex flex-wrap gap-2 mb-6">
+          <a
+            href="/prestadores"
+            class={`px-3 py-1.5 rounded-full text-xs font-bold transition ${
+              !catParam
+                ? 'bg-emerald-500 text-slate-950'
+                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:border-emerald-500/40'
+            }`}
+          >
+            Todos
+          </a>
+          {categorias.map((cat) => (
+            <a
+              href={`/prestadores?categoria=${cat.slug}`}
+              class={`px-3 py-1.5 rounded-full text-xs font-bold transition ${
+                catParam === cat.slug
+                  ? 'bg-emerald-500 text-slate-950'
+                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:border-emerald-500/40'
+              }`}
+            >
+              {cat.nombre}
+            </a>
+          ))}
+        </div>
+      )}
+
+      {prestadores.length === 0 && !errorMsg && (
+        <div class="text-center py-16">
+          <p class="text-4xl mb-3">🔧</p>
+          <p class="text-slate-400 text-sm">No hay prestadores disponibles todavía.</p>
+          <p class="text-slate-500 text-xs mt-1">Vuelve pronto.</p>
+        </div>
+      )}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {prestadores.map((p) => (
+          <a
+            href={`/prestadores/${p.slug}`}
+            class="block bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/40 transition-all group"
+          >
+            <div class="relative h-32 bg-gradient-to-br from-emerald-900 to-slate-950">
+              {p.foto_portada_url ? (
+                <img
+                  src={p.foto_portada_url}
+                  alt={p.nombre}
+                  class="w-full h-full object-cover opacity-60"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="flex items-center justify-center h-full text-4xl opacity-30">
+                  🔧
+                </div>
+              )}
+              {p.destacado && (
+                <span class="absolute top-2 right-2 text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-500/90 text-slate-950">
+                  Destacado
+                </span>
+              )}
+            </div>
+
+            <div class="p-4">
+              <div class="flex items-start gap-3 mb-2">
+                {p.foto_url ? (
+                  <img
+                    src={p.foto_url}
+                    alt={p.nombre}
+                    class="w-12 h-12 rounded-full object-cover border-2 border-slate-950 -mt-8 relative z-10"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div class="w-12 h-12 rounded-full bg-emerald-950 border-2 border-slate-950 flex items-center justify-center text-xl -mt-8 relative z-10">
+                    🔧
+                  </div>
+                )}
+                <div class="flex-1 min-w-0">
+                  <h2 class="font-bold text-slate-100 text-sm group-hover:text-emerald-400 transition-colors truncate">
+                    {p.nombre}
+                  </h2>
+                  <p class="text-xs text-emerald-400 font-medium">
+                    {p.categoria.nombre}
+                  </p>
+                </div>
+                {p.verificado && (
+                  <span class="text-emerald-400 text-sm" title="Verificado">✓</span>
+                )}
+              </div>
+
+              {p.descripcion && (
+                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                  {p.descripcion}
+                </p>
+              )}
+
+              <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
+                <span class="text-[11px] text-slate-400">
+                  {p.anios_experiencia ? `${p.anios_experiencia} años exp.` : '—'}
+                </span>
+                <span class="text-[10px] font-bold text-amber-400">
+                  ★ {Number(p.calificacion_promedio).toFixed(1)} ({p.total_resenas})
+                </span>
+              </div>
+
+              <div class="flex items-center gap-2 mt-2 text-[10px] flex-wrap">
+                {p.atiende_domicilio && (
+                  <span class="px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
+                    A domicilio
+                  </span>
+                )}
+                {p.atiende_emergencias && (
+                  <span class="px-2 py-0.5 rounded bg-red-950/60 text-red-400 border border-red-500/30">
+                    24/7
+                  </span>
+                )}
+                {p.especialidades.slice(0, 2).map((esp) => (
+                  <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                    {nombreEspecialidad(esp)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <footer class="mt-12 text-center text-xs text-slate-500 space-y-1">
+        <p>Red Baqueano Natales</p>
+        <p class="text-[11px]">Tecnología desarrollada por Studio Digital 360</p>
+      </footer>
+    </div>
+  </main>
+</Layout>
