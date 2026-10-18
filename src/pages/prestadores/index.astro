@@ -20,8 +20,11 @@ try {
     fetchPrestadores(),
     fetchCategoriasOficio(),
   ]);
-  // Solo mostrar verificados (los no verificados son drafts o pruebas)
-  prestadores = dataPrest.items.filter((p) => p.verificado);
+  // Solo mostrar verificados con datos completos
+  // (evita crashes si un prestador tiene categoria o especialidades null)
+  prestadores = dataPrest.items.filter(
+    (p) => p.verificado && p.categoria && Array.isArray(p.especialidades),
+  );
   total = prestadores.length;
   categorias = dataCats;
 } catch {
@@ -138,7 +141,7 @@ if (catParam) {
                     {p.nombre}
                   </h2>
                   <p class="text-xs text-emerald-400 font-medium">
-                    {p.categoria.nombre}
+                    {p.categoria?.nombre ?? 'Sin categoría'}
                   </p>
                 </div>
                 {p.verificado && (
@@ -172,7 +175,7 @@ if (catParam) {
                     24/7
                   </span>
                 )}
-                {p.especialidades.slice(0, 2).map((esp) => (
+                {(p.especialidades ?? []).slice(0, 2).map((esp) => (
                   <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
                     {nombreEspecialidad(esp)}
                   </span>
