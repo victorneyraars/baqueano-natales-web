@@ -1,46 +1,119 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { locales } from '../../data/menus';
+import { fetchComercios, type ComercioListItem } from '../../config/api';
 
-const listaLocales = Object.values(locales);
+export const prerender = false;
+
+let comercios: ComercioListItem[] = [];
+let total = 0;
+let errorMsg: string | null = null;
+
+try {
+  const data = await fetchComercios();
+  comercios = data.items;
+  total = data.meta.total;
+} catch (e) {
+  errorMsg = 'No se pudo cargar el listado de comercios.';
+}
 ---
 
 <Layout title="Locales y Comercios | Baqueano Natales">
   <main class="min-h-screen bg-slate-950 text-slate-100 pb-24">
-    <!-- Encabezado -->
     <header class="border-b border-emerald-500/20 bg-slate-900/60 p-6 pt-12 text-center">
-      <h1 class="text-2xl font-black tracking-tight text-white mb-1">Locales Asociados</h1>
-      <p class="text-xs text-slate-400">Descubre los comercios, gastronomía y servicios en Puerto Natales</p>
+      <h1 class="text-2xl font-black tracking-tight text-white mb-1">
+        Locales Asociados
+      </h1>
+      <p class="text-xs text-slate-400">
+        Descubre la gastronomía, servicios y comercios de Puerto Natales
+      </p>
+      {total > 0 && (
+        <p class="text-[10px] text-emerald-400 mt-2 font-semibold">
+          {total} {total === 1 ? 'comercio verificado' : 'comercios verificados'}
+        </p>
+      )}
     </header>
 
-    <div class="max-w-md mx-auto px-4 py-6 space-y-4">
-      {listaLocales.map((local) => (
-        <a 
-          href={`/locales/${local.tipo}/${local.slug}`}
-          class="block p-4 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-all group"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-3">
-              <span class="text-3xl">{local.logo}</span>
-              <div>
-                <h2 class="font-bold text-slate-100 text-base group-hover:text-emerald-400 transition-colors">
-                  {local.name}
-                </h2>
-                <p class="text-xs text-emerald-400 font-medium">{local.rubro}</p>
+    <div class="max-w-2xl mx-auto px-4 py-6">
+      {errorMsg && (
+        <div class="p-4 rounded-xl bg-red-950/40 border border-red-500/30 mb-4">
+          <p class="text-xs text-red-300">{errorMsg}</p>
+        </div>
+      )}
+
+      {comercios.length === 0 && !errorMsg && (
+        <div class="text-center py-16">
+          <p class="text-4xl mb-3">🏪</p>
+          <p class="text-slate-400 text-sm">No hay comercios disponibles todavía.</p>
+          <p class="text-slate-500 text-xs mt-1">Vuelve pronto.</p>
+        </div>
+      )}
+
+      <div class="space-y-3">
+        {comercios.map((c) => (
+          <a
+            href={`/locales/${c.categoria.slug}/${c.slug}`}
+            class="block p-4 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-all group"
+          >
+            <div class="flex items-start gap-3 mb-2">
+              {c.logo_url ? (
+                <img
+                  src={c.logo_url}
+                  alt={c.nombre}
+                  class="w-14 h-14 rounded-lg object-cover border border-slate-800 bg-slate-950 shrink-0"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="w-14 h-14 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-2xl shrink-0">
+                  🏪
+                </div>
+              )}
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <h2 class="font-bold text-slate-100 text-base group-hover:text-emerald-400 transition-colors truncate">
+                    {c.nombre}
+                  </h2>
+                  {c.destacado && (
+                    <span class="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">
+                      Destacado
+                    </span>
+                  )}
+                </div>
+                <p class="text-xs text-emerald-400 font-medium">
+                  {c.categoria.nombre}
+                </p>
+                {c.descripcion_corta && (
+                  <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                    {c.descripcion_corta}
+                  </p>
+                )}
               </div>
             </div>
-            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
-              {local.tipoLabel}
-            </span>
-          </div>
 
-          <p class="text-xs text-slate-400 flex items-center gap-1 mt-3 pt-3 border-t border-slate-800/60">
-            📍 {local.address}
-          </p>
-        </a>
-      ))}
+            <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
+              <span class="text-[11px] text-slate-400 truncate flex items-center gap-1">
+                {c.direccion}
+              </span>
+              <span class="text-[10px] font-bold text-amber-400 flex items-center gap-1 shrink-0">
+                {Number(c.rating_promedio).toFixed(1)} ({c.total_resenas})
+              </span>
+            </div>
 
-      <!-- Pie informativo -->
+            <div class="flex items-center gap-2 mt-2 text-[10px]">
+              {c.acepta_delivery && (
+                <span class="px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
+                  Delivery
+                </span>
+              )}
+              {c.acepta_retiro && (
+                <span class="px-2 py-0.5 rounded bg-blue-950/60 text-blue-400 border border-blue-500/30">
+                  Retiro
+                </span>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+
       <footer class="mt-12 text-center text-xs text-slate-500 space-y-1">
         <p>Red Baqueano Natales</p>
         <p class="text-[11px]">Tecnología desarrollada por Studio Digital 360</p>

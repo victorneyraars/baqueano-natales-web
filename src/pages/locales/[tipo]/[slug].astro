@@ -1,90 +1,188 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
-import { locales } from '../../../data/menus';
+import {
+  fetchComercioPorSlug,
+  formatearHorario,
+  DIAS_SEMANA,
+} from '../../../config/api';
 
-export function getStaticPaths() {
-  return Object.values(locales).map((local) => ({
-    params: { tipo: local.tipo, slug: local.slug },
-    props: { local },
-  }));
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/locales');
 }
 
-const { local } = Astro.props;
+const comercio = await fetchComercioPorSlug(slug);
+
+if (!comercio) {
+  return Astro.redirect('/locales');
+}
+
+const horariosOrdenados = [...comercio.horarios].sort((a, b) => {
+  const pesoA = a.dia_semana === 0 ? 7 : a.dia_semana;
+  const pesoB = b.dia_semana === 0 ? 7 : b.dia_semana;
+  return pesoA - pesoB;
+});
+
+const whatsappLink = comercio.whatsapp
+  ? `https://wa.me/${comercio.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Quiero hacer un pedido en ${comercio.nombre}`)}`
+  : null;
 ---
 
-<Layout title={`${local.name} | Catálogo Baqueano`}>
+<Layout title={`${comercio.nombre} | Baqueano Natales`}>
   <main class="min-h-screen bg-slate-950 text-slate-100 pb-24">
-    <!-- Banner Principal -->
-    <div class={`${local.banner} p-6 pt-12 pb-8 border-b border-emerald-500/20`}>
-      <div class="max-w-md mx-auto text-center">
-        <div class="text-5xl mb-3">{local.logo}</div>
-        <h1 class="text-2xl font-black tracking-tight text-white mb-1">{local.name}</h1>
-        <p class="text-sm font-medium text-emerald-400 mb-2">{local.rubro}</p>
-        <p class="text-xs text-slate-300 flex items-center justify-center gap-1">
-          📍 {local.address}
-        </p>
+    <div class="relative h-56 bg-gradient-to-br from-emerald-900 via-slate-900 to-emerald-950 overflow-hidden">
+      {comercio.portada_url && (
+        <img
+          src={comercio.portada_url}
+          alt={comercio.nombre}
+          class="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+      )}
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+
+      <div class="relative max-w-2xl mx-auto px-4 pt-8 flex items-end gap-4 h-full pb-4">
+        {comercio.logo_url ? (
+          <img
+            src={comercio.logo_url}
+            alt={comercio.nombre}
+            class="w-20 h-20 rounded-2xl object-cover border-4 border-slate-950 shadow-2xl shrink-0"
+          />
+        ) : (
+          <div class="w-20 h-20 rounded-2xl bg-emerald-950 border-4 border-slate-950 flex items-center justify-center text-4xl shrink-0">
+            🏪
+          </div>
+        )}
+        <div class="flex-1 min-w-0 pb-1">
+          <h1 class="text-2xl font-black text-white leading-tight mb-1">
+            {comercio.nombre}
+          </h1>
+          <p class="text-xs text-emerald-400 font-semibold">
+            {comercio.categoria.nombre}
+          </p>
+        </div>
       </div>
     </div>
 
-    <div class="max-w-md mx-auto px-4 py-6">
-      <!-- Filtros de Categorías -->
-      <div class="flex gap-2 overflow-x-auto pb-4 mb-4 scrollbar-none">
-        <button class="px-4 py-2 rounded-full text-xs font-semibold bg-emerald-500 text-slate-950 whitespace-nowrap shadow-lg shadow-emerald-500/20">
-          Todos los Productos
-        </button>
-        {local.categories.map((cat) => (
-          <button class="px-4 py-2 rounded-full text-xs font-medium bg-slate-900 border border-slate-800 text-slate-400 whitespace-nowrap">
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      <!-- Alerta Atención Directa -->
-      <div class="p-4 rounded-xl bg-slate-900/80 border border-emerald-500/20 mb-6 flex items-center justify-between">
-        <div>
-          <span class="text-[10px] font-bold tracking-wider uppercase text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">Atención Directa</span>
-          <p class="text-xs font-semibold text-slate-200 mt-1">Los pedidos se procesan por la App</p>
-          <p class="text-[11px] text-slate-400">Tu orden se coordina directo con el comercio.</p>
+    <div class="max-w-2xl mx-auto px-4 py-6">
+      <div class="grid grid-cols-3 gap-2 mb-6">
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center">
+          <p class="text-2xl font-black text-amber-400">{Number(comercio.rating_promedio).toFixed(1)}</p>
+          <p class="text-[10px] text-slate-500 uppercase font-bold">{comercio.total_resenas} reseñas</p>
         </div>
-        <a href={`https://wa.me/${local.whatsapp}`} target="_blank" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition-colors">
-          Abrir App
-        </a>
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center">
+          <p class="text-2xl font-black text-emerald-400">
+            {comercio.acepta_delivery ? '🛵' : comercio.acepta_retiro ? '🏃' : '📍'}
+          </p>
+          <p class="text-[10px] text-slate-500 uppercase font-bold">
+            {comercio.acepta_delivery ? 'Delivery' : comercio.acepta_retiro ? 'Retiro' : 'Presencial'}
+          </p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center">
+          <p class="text-2xl font-black text-blue-400">
+            {comercio.acepta_delivery && comercio.costo_envio_clp > 0
+              ? `$${(comercio.costo_envio_clp / 1000).toFixed(0)}k`
+              : '—'}
+          </p>
+          <p class="text-[10px] text-slate-500 uppercase font-bold">Envío</p>
+        </div>
       </div>
 
-      <!-- Lista de Items con soporte para Imagen -->
-      <div class="space-y-3">
-        {local.items.map((item) => (
-          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-colors">
-            <div class="flex justify-between items-start gap-3 mb-2">
-              <div class="flex-1">
-                <h3 class="font-bold text-slate-100 text-base">{item.name}</h3>
-                <p class="text-xs text-slate-400 mt-0.5">{item.description}</p>
-                <div class="mt-2 font-black text-emerald-400 text-base">
-                  ${item.price.toLocaleString('es-CL')}
-                </div>
-              </div>
-              {item.image && (
-                <img 
-                  src={item.image} 
-                  alt={item.name} 
-                  class="w-20 h-20 object-cover rounded-lg border border-slate-800 bg-slate-950 shrink-0" 
-                  loading="lazy"
-                />
-              )}
-            </div>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-800/60 mt-2">
-              <span class="text-[10px] text-slate-400">{item.category}</span>
-              <a href={`https://wa.me/${local.whatsapp}?text=Hola!%20Quiero%20pedir%20${encodeURIComponent(item.name)}`} target="_blank" class="px-3 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-semibold transition-all">
-                Pedir en la App 📲
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
+      {comercio.descripcion_larga && (
+        <section class="mb-6">
+          <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+            Sobre el comercio
+          </h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            {comercio.descripcion_larga}
+          </p>
+        </section>
+      )}
 
-      <!-- Footer informativo -->
-      <footer class="mt-12 text-center text-xs text-slate-500 space-y-1">
-        <p>Catálogo Digital de Comercio · Red Baqueano Natales</p>
+      <section class="mb-6">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+          Ubicación
+        </h2>
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+          <p class="text-sm text-slate-200">{comercio.direccion}</p>
+          <p class="text-xs text-slate-500 mt-1">{comercio.ciudad}, {comercio.region}</p>
+        </div>
+      </section>
+
+      <section class="mb-6">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+          Horarios
+        </h2>
+        <div class="rounded-xl bg-slate-900/60 border border-slate-800 divide-y divide-slate-800/60">
+          {horariosOrdenados.map((h) => (
+            <div class="flex items-center justify-between p-3">
+              <span class="text-sm text-slate-300 font-medium">
+                {DIAS_SEMANA[h.dia_semana]}
+              </span>
+              <span class={`text-sm font-semibold ${h.cerrado ? 'text-slate-500' : 'text-emerald-400'}`}>
+                {formatearHorario(h)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="mb-6">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+          Contacto
+        </h2>
+        <div class="space-y-2">
+          {whatsappLink && (
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors group"
+            >
+              <span class="text-sm font-bold text-emerald-400">Contactar por WhatsApp</span>
+              <span class="text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
+            </a>
+          )}
+          {comercio.telefono && (
+            <a
+              href={`tel:${comercio.telefono}`}
+              class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-colors"
+            >
+              <span class="text-sm text-slate-300">{comercio.telefono}</span>
+            </a>
+          )}
+          {comercio.email && (
+            <a
+              href={`mailto:${comercio.email}`}
+              class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-colors"
+            >
+              <span class="text-sm text-slate-300">{comercio.email}</span>
+            </a>
+          )}
+          {comercio.sitio_web && (
+            <a
+              href={comercio.sitio_web}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-colors"
+            >
+              <span class="text-sm text-slate-300">{comercio.sitio_web}</span>
+            </a>
+          )}
+        </div>
+      </section>
+
+      <a
+        href="/locales"
+        class="block text-center p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-colors text-sm text-slate-300 font-medium"
+      >
+        Volver al listado
+      </a>
+
+      <footer class="mt-8 text-center text-xs text-slate-500 space-y-1">
+        <p>Catálogo Digital · Red Baqueano Natales</p>
         <p class="text-[11px]">Tecnología desarrollada por Studio Digital 360</p>
       </footer>
     </div>
