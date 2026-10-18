@@ -1,16 +1,20 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const APK_URL = 'https://api-dev.baqueanonatales.com/apks/app-clientdev.apk';
-const APK_URL_PROD = 'https://api.baqueanonatales.com/apks/prod-client.apk';
+// URLs de los APKs
+const APK_DEV = 'https://api-dev.baqueanonatales.com/apks/app-clientdev.apk';
+const APK_PROD = 'https://api.baqueanonatales.com/apks/prod-client.apk';
 ---
 
 <Layout title="Descargar Baqueano Natales">
   <main class="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center px-4 py-12">
-    <div class="w-24 h-24 bg-emerald-500/10 rounded-3xl flex items-center justify-center mb-6 border border-emerald-500/30">
+    
+    <!-- Icono -->
+    <div class="w-24 h-24 bg-emerald-500/10 rounded-3xl flex items-center justify-center mb-6 border border-emerald-500/30 shadow-lg shadow-emerald-900/50">
       <img src="/assets/baqueano_icono.svg" alt="Baqueano" class="w-16 h-16" />
     </div>
 
+    <!-- Título -->
     <h1 class="text-3xl sm:text-4xl font-black text-white text-center mb-2">
       Descarga <span class="text-amber-400">Baqueano</span>
     </h1>
@@ -18,24 +22,44 @@ const APK_URL_PROD = 'https://api.baqueanonatales.com/apks/prod-client.apk';
       Encuentra oficios y comercios en Puerto Natales. Agenda servicios y contacta directo.
     </p>
 
-    <a href={APK_URL}
-       class="w-full max-w-xs flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg px-6 py-4 rounded-xl shadow-lg transition-all active:scale-95 mb-4">
-      <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      Descargar APK
-    </a>
+    <!-- Botones de Descarga -->
+    <div class="w-full max-w-sm flex flex-col gap-3 mb-10">
+      
+      <!-- Botón Producción -->
+      <a href={APK_PROD}
+         class="w-full flex items-center justify-between bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg px-5 py-4 rounded-xl shadow-lg shadow-emerald-900/50 transition-all active:scale-95 group">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          <span>Descargar App</span>
+        </div>
+        <span class="text-[10px] bg-emerald-950/60 text-emerald-200 px-2 py-1 rounded border border-emerald-400/30 group-hover:bg-emerald-800 transition">ESTABLE</span>
+      </a>
+
+      <!-- Botón DEV -->
+      <a href={APK_DEV}
+         class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-lg px-5 py-4 rounded-xl transition-all active:scale-95 group">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          <span>Descargar Beta</span>
+        </div>
+        <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-1 rounded border border-amber-500/30 group-hover:bg-amber-500/30 transition">DEV</span>
+      </a>
+
+    </div>
 
     <p class="text-xs text-slate-500 mb-10 text-center">
-      Versión DEV · Compatible con Android 8.0+
+      Compatible con Android 8.0+
     </p>
 
+    <!-- Instrucciones -->
     <div class="w-full max-w-md space-y-4">
       <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">Cómo instalar</h2>
-
+      
       <div class="flex gap-3 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
         <span class="text-emerald-400 font-black text-lg">1</span>
         <div>
           <p class="text-sm font-bold text-slate-200">Descarga el archivo .apk</p>
-          <p class="text-xs text-slate-400 mt-1">Toca el botón verde y espera la descarga completa</p>
+          <p class="text-xs text-slate-400 mt-1">Toca el botón verde (o el gris para la versión DEV) y espera la descarga completa.</p>
         </div>
       </div>
 
@@ -51,15 +75,16 @@ const APK_URL_PROD = 'https://api.baqueanonatales.com/apks/prod-client.apk';
         <span class="text-emerald-400 font-black text-lg">3</span>
         <div>
           <p class="text-sm font-bold text-slate-200">Abre e inicia sesión</p>
-          <p class="text-xs text-slate-400 mt-1">Usa tu cuenta de Google para empezar</p>
+          <p class="text-xs text-slate-400 mt-1">Usa tu cuenta de Google para empezar.</p>
         </div>
       </div>
     </div>
 
-    <div class="mt-10 text-center space-y-2">
+    <div class="mt-10 text-center">
       <p class="text-xs text-slate-500">
         <a href="/" class="text-emerald-400 hover:underline">← Volver al inicio</a>
       </p>
     </div>
+
   </main>
 </Layout>
