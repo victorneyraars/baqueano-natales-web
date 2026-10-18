@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const APK_URL = 'https://api-dev.baqueanonatales.com/apks/app-clientdev.apk';
+const APK_URL_PROD = 'https://api.baqueanonatales.com/apks/prod-client.apk';
+---
+
+<Layout title="Descargar Baqueano Natales">
+  <main class="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center px-4 py-12">
+    <div class="w-24 h-24 bg-emerald-500/10 rounded-3xl flex items-center justify-center mb-6 border border-emerald-500/30">
+      <img src="/assets/baqueano_icono.svg" alt="Baqueano" class="w-16 h-16" />
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-black text-white text-center mb-2">
+      Descarga <span class="text-amber-400">Baqueano</span>
+    </h1>
+    <p class="text-slate-400 text-sm text-center max-w-md mb-8">
+      Encuentra oficios y comercios en Puerto Natales. Agenda servicios y contacta directo.
+    </p>
+
+    <a href={APK_URL}
+       class="w-full max-w-xs flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg px-6 py-4 rounded-xl shadow-lg transition-all active:scale-95 mb-4">
+      <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Descargar APK
+    </a>
+
+    <p class="text-xs text-slate-500 mb-10 text-center">
+      Versión DEV · Compatible con Android 8.0+
+    </p>
+
+    <div class="w-full max-w-md space-y-4">
+      <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">Cómo instalar</h2>
+
+      <div class="flex gap-3 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+        <span class="text-emerald-400 font-black text-lg">1</span>
+        <div>
+          <p class="text-sm font-bold text-slate-200">Descarga el archivo .apk</p>
+          <p class="text-xs text-slate-400 mt-1">Toca el botón verde y espera la descarga completa</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+        <span class="text-emerald-400 font-black text-lg">2</span>
+        <div>
+          <p class="text-sm font-bold text-slate-200">Habilita la instalación</p>
+          <p class="text-xs text-slate-400 mt-1">Android pedirá permiso para instalar apps de origen desconocido. Acepta.</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+        <span class="text-emerald-400 font-black text-lg">3</span>
+        <div>
+          <p class="text-sm font-bold text-slate-200">Abre e inicia sesión</p>
+          <p class="text-xs text-slate-400 mt-1">Usa tu cuenta de Google para empezar</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-10 text-center space-y-2">
+      <p class="text-xs text-slate-500">
+        <a href="/" class="text-emerald-400 hover:underline">← Volver al inicio</a>
+      </p>
+    </div>
+  </main>
+</Layout>

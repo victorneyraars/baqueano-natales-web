@@ -1,13 +1,14 @@
 ---
 // src/pages/index.astro - Baqueano Natales Landing Page
+const APK_URL = 'https://api-dev.baqueanonatales.com/apks/app-clientdev.apk';
 ---
 <!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Baqueano Natales | La Superapp de Puerto Natales</title>
-    <meta name="description" content="Movilidad, Delivery, Hospedaje y Oficios en un solo lugar. La plataforma integral para la Patagonia." />
+    <title>Baqueano Natales | Oficios y Comercios de Puerto Natales</title>
+    <meta name="description" content="Encuentra mecánicos, gasfiteros, electricistas y los mejores comercios de Puerto Natales. Agenda servicios y contacta directo." />
     <link rel="icon" type="image/svg+xml" href="/assets/baqueano_icono.svg" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,15 +23,15 @@
   </head>
   <body class="bg-slate-900 text-slate-100 antialiased selection:bg-amber-500 selection:text-slate-950">
 
-    <!-- Header Glassmorphism -->
+    <!-- Header -->
     <header class="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-emerald-500/20">
       <nav class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <a href="#" class="flex items-center gap-2.5 group">
+        <a href="/" class="flex items-center gap-2.5 group">
           <img src="/assets/baqueano_icono.svg" alt="Baqueano Natales" class="h-8 w-8 transition-transform group-hover:scale-105" />
           <span class="font-extrabold text-lg tracking-tight text-white">Baqueano <span class="text-amber-400">Natales</span></span>
         </a>
         <div class="flex items-center gap-3">
-          <a href="#servicios" class="hidden sm:inline-block text-sm font-medium text-emerald-200/80 hover:text-white transition">Servicios</a>
+          <a href="/locales" class="hidden sm:inline-block text-sm font-medium text-emerald-200/80 hover:text-white transition">Comercios</a>
           <a href="/descargar"
              class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 active:scale-95">
             Descargar App
@@ -39,43 +40,42 @@
       </nav>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero -->
     <section class="relative pt-24 pb-16 px-4 sm:px-6 bg-patagonia overflow-hidden">
       <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="max-w-4xl mx-auto text-center relative z-10">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-6">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Superapp Oficial de Puerto Natales
+          Los oficios y comercios de Puerto Natales, en tu mano
         </div>
-        
+
         <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-          Tu ciudad y tus viajes,<br class="hidden sm:inline" />
-          <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-amber-300 to-amber-400">en una sola aplicación</span>
+          Encuentra al experto<br class="hidden sm:inline" />
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-amber-300 to-amber-400">que necesitas hoy</span>
         </h1>
-        
+
         <p class="text-base sm:text-lg text-emerald-100/80 max-w-xl mx-auto mb-8 font-normal">
-          Movilidad a Torres del Paine y aeropuerto, delivery de tus locales favoritos, hospedajes y oficios locales al instante.
+          Mecánicos, gasfiteros, electricistas y los mejores comercios locales. Agenda servicios, gestiona tus órdenes y contacta directo por WhatsApp.
         </p>
 
-        <!-- Botones de Acción -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto mb-12">
           <a href="/descargar"
              class="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-emerald-900/50 transition-all active:scale-95">
-            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993 0 .5511-.4483.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4128 13.8533 8.0818 12 8.0818s-3.5902.331-5.1368.8679L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
-            <span>Descargar APK</span>
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <span>Descargar App</span>
           </a>
-          <a href="#socios"
+          <a href="/locales"
              class="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-slate-200 font-bold px-6 py-3.5 rounded-xl transition-all active:scale-95">
-            <span>Soy Comercio / Chofer</span>
+            <span>Ver Comercios</span>
           </a>
         </div>
 
-        <!-- Phone Mockup Proporcional -->
+        <!-- Phone mockup con pantalla REAL de la app -->
         <div class="relative max-w-[280px] sm:max-w-[300px] mx-auto">
           <div class="relative bg-slate-950 p-2.5 rounded-[2.5rem] border-4 border-slate-800 shadow-2xl shadow-emerald-950/80">
             <div class="w-20 h-3.5 bg-slate-800 rounded-full mx-auto mb-2"></div>
-            
+
             <div class="bg-gradient-to-b from-emerald-900 to-slate-950 rounded-[2rem] p-4 text-left border border-emerald-500/20">
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
@@ -84,29 +84,30 @@
                 </div>
                 <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full">Natales</span>
               </div>
-              
+
+              <!-- Card saludo -->
               <div class="bg-slate-900/80 rounded-xl p-3 border border-emerald-500/10 mb-3">
-                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-0.5">¿A dónde vamos hoy?</p>
-                <p class="text-xs text-slate-200 font-medium">Torres del Paine, Centro, Aeropuerto...</p>
+                <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-0.5">¡Hola!</p>
+                <p class="text-xs text-slate-200 font-medium">¿Qué necesitas hoy?</p>
               </div>
 
-              <!-- Categorías de la App -->
+              <!-- Cards reales de la app -->
               <div class="grid grid-cols-2 gap-2 mb-2">
-                <div class="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/20 text-center">
-                  <span class="text-base">🚗</span>
-                  <p class="text-[10px] font-bold text-white mt-1">Movilidad</p>
-                </div>
-                <div class="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/20 text-center">
-                  <span class="text-base">🍔</span>
-                  <p class="text-[10px] font-bold text-white mt-1">Delivery</p>
-                </div>
-                <div class="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/20 text-center">
-                  <span class="text-base">🏨</span>
-                  <p class="text-[10px] font-bold text-white mt-1">Hospedajes</p>
-                </div>
                 <div class="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/20 text-center">
                   <span class="text-base">🔧</span>
                   <p class="text-[10px] font-bold text-white mt-1">Oficios</p>
+                </div>
+                <div class="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/20 text-center">
+                  <span class="text-base">📋</span>
+                  <p class="text-[10px] font-bold text-white mt-1">Mis órdenes</p>
+                </div>
+                <div class="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/20 text-center">
+                  <span class="text-base">📅</span>
+                  <p class="text-[10px] font-bold text-white mt-1">Mis turnos</p>
+                </div>
+                <div class="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/20 text-center">
+                  <span class="text-base">🏪</span>
+                  <p class="text-[10px] font-bold text-white mt-1">Comercios</p>
                 </div>
               </div>
             </div>
@@ -116,41 +117,36 @@
       </div>
     </section>
 
-    <!-- Servicios Section (Oscuro & Elegante) -->
+    <!-- ¿Qué puedes hacer hoy? -->
     <section id="servicios" class="py-16 px-4 sm:px-6 bg-slate-950 border-t border-slate-800/80">
       <div class="max-w-5xl mx-auto">
         <div class="text-center mb-10">
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Todo en tu mano</h2>
-          <p class="text-slate-400 text-sm">Servicios diseñados especialmente para la comunidad de Natales y visitantes.</p>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Todo lo que puedes hacer hoy</h2>
+          <p class="text-slate-400 text-sm">Diseñado para la comunidad de Natales y sus visitantes.</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all text-center group">
-            <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 group-hover:scale-110 transition-transform">🚗</div>
-            <h3 class="font-bold text-white text-sm sm:text-base mb-1">Movilidad</h3>
-            <p class="text-slate-400 text-xs">Transfers a Torres del Paine, Aeropuerto y carreras urbanas.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all text-center group">
+            <div class="w-14 h-14 bg-emerald-500/10 rounded-xl flex items-center justify-center text-3xl mx-auto mb-3 group-hover:scale-110 transition-transform">🔧</div>
+            <h3 class="font-bold text-white text-base mb-2">Encuentra oficios</h3>
+            <p class="text-slate-400 text-sm">Mecánicos, gasfiteros, electricistas y técnicos verificados en Puerto Natales.</p>
           </div>
-          <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all text-center group">
-            <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 group-hover:scale-110 transition-transform">🍔</div>
-            <h3 class="font-bold text-white text-sm sm:text-base mb-1">Delivery</h3>
-            <p class="text-slate-400 text-xs">Cartas digitales QR y pedidos directos a comercios y locales.</p>
-            <a href="/locales" class="text-emerald-400 text-xs font-bold hover:underline block mt-2">Ver Locales →</a>
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all text-center group">
+            <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center text-3xl mx-auto mb-3 group-hover:scale-110 transition-transform">📅</div>
+            <h3 class="font-bold text-white text-base mb-2">Agenda servicios</h3>
+            <p class="text-slate-400 text-sm">Reserva turnos y gestiona tus órdenes con seguimiento en tiempo real.</p>
           </div>
-          <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all text-center group">
-            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 group-hover:scale-110 transition-transform">🏨</div>
-            <h3 class="font-bold text-white text-sm sm:text-base mb-1">Hospedajes</h3>
-            <p class="text-slate-400 text-xs">Hostels, cabañas y alojamientos locales certificados.</p>
-          </div>
-          <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all text-center group">
-            <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 group-hover:scale-110 transition-transform">🔧</div>
-            <h3 class="font-bold text-white text-sm sm:text-base mb-1">Oficios</h3>
-            <p class="text-slate-400 text-xs">Gasfitería, mecánica, cerrajería y técnicos de confianza.</p>
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all text-center group">
+            <div class="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center text-3xl mx-auto mb-3 group-hover:scale-110 transition-transform">🏪</div>
+            <h3 class="font-bold text-white text-base mb-2">Descubre comercios</h3>
+            <p class="text-slate-400 text-sm">Catálogo de locales locales con contacto directo por WhatsApp.</p>
+            <a href="/locales" class="text-emerald-400 text-xs font-bold hover:underline block mt-3">Ver locales →</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Sección Socios / Registro Comercial -->
+    <!-- Únete a la Red -->
     <section id="socios" class="py-16 px-4 sm:px-6 bg-slate-900 border-t border-slate-800">
       <div class="max-w-4xl mx-auto">
         <div class="text-center mb-10">
@@ -161,38 +157,57 @@
         <div class="grid sm:grid-cols-2 gap-4">
           <div class="bg-slate-950 p-6 rounded-2xl border border-emerald-500/20 flex flex-col justify-between">
             <div>
-              <div class="text-2xl mb-2">🚘</div>
-              <h3 class="text-lg font-bold text-white mb-2">¿Eres Conductor o Transfer?</h3>
-              <p class="text-slate-400 text-xs sm:text-sm mb-6">Genera ingresos conectando a turistas y residentes con traslados urbanos y excursiones al parque.</p>
+              <div class="text-2xl mb-2">🔧</div>
+              <h3 class="text-lg font-bold text-white mb-2">¿Eres un experto?</h3>
+              <p class="text-slate-400 text-sm mb-6">Mecánicos, gasfiteros, electricistas y otros oficios. Suma tu perfil, recibe clientes y gestiona tus órdenes desde la app.</p>
             </div>
-            <a href="https://wa.me/?text=Hola!%20Quiero%20registrarme%20como%20conductor%20en%20Baqueano%20Natales" target="_blank"
-               class="inline-flex items-center justify-center gap-2 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-bold py-2.5 px-4 rounded-xl transition">
-              Registrar mi Vehículo →
+            <a href="https://wa.me/56987654321?text=Hola!%20Quiero%20sumar%20mi%20oficio%20a%20Baqueano%20Natales" target="_blank"
+               class="inline-flex items-center justify-center gap-2 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-sm font-bold py-2.5 px-4 rounded-xl transition">
+              Sumar mi oficio →
             </a>
           </div>
 
           <div class="bg-slate-950 p-6 rounded-2xl border border-amber-500/20 flex flex-col justify-between">
             <div>
               <div class="text-2xl mb-2">🏪</div>
-              <h3 class="text-lg font-bold text-white mb-2">¿Tienes un Local o Servicio?</h3>
-              <p class="text-slate-400 text-xs sm:text-sm mb-6">Digitaliza tu carta con menús QR, recibe pedidos por delivery y ofrece tus habitaciones o servicios técnicos.</p>
+              <h3 class="text-lg font-bold text-white mb-2">¿Tienes un local?</h3>
+              <p class="text-slate-400 text-sm mb-6">Comercios y servicios. Publica tu catálogo, conecta con clientes y recibe pedidos directamente.</p>
             </div>
-            <a href="https://wa.me/?text=Hola!%20Quiero%20sumar%20mi%20local/servicio%20a%20Baqueano%20Natales" target="_blank"
-               class="inline-flex items-center justify-center gap-2 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs sm:text-sm font-bold py-2.5 px-4 rounded-xl transition">
-              Sumar mi Negocio →
+            <a href="https://wa.me/56987654321?text=Hola!%20Quiero%20sumar%20mi%20local%20a%20Baqueano%20Natales" target="_blank"
+               class="inline-flex items-center justify-center gap-2 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-sm font-bold py-2.5 px-4 rounded-xl transition">
+              Sumar mi local →
             </a>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Próximamente (honesto) -->
+    <section class="py-12 px-4 sm:px-6 bg-slate-950 border-t border-slate-800">
+      <div class="max-w-4xl mx-auto text-center">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">En desarrollo</span>
+        <p class="text-slate-400 text-sm mt-2 mb-6">Estamos trabajando para traerte más servicios en Puerto Natales.</p>
+        <div class="flex flex-wrap justify-center gap-2">
+          <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-500 text-xs">🚗 Movilidad</span>
+          <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-500 text-xs">🛵 Delivery</span>
+          <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-500 text-xs">🏨 Hospedajes</span>
+          <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-500 text-xs">📱 Menú QR</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
-    <footer class="py-8 px-4 text-center bg-slate-950 border-t border-slate-900 text-xs text-slate-500">
+    <footer class="py-8 px-4 bg-slate-950 border-t border-slate-900 text-xs text-slate-500">
       <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <p>© 2026 Baqueano Natales. Todos los derechos reservados.</p>
-        <p class="font-medium text-slate-400">
-          Diseñado y Desarrollado por <span class="text-emerald-400 font-bold">StudioDigital360</span>
-        </p>
+        <div class="flex items-center gap-3">
+          <a href="https://api.baqueanonatales.com/legal/privacidad" class="hover:text-emerald-400 transition">Privacidad</a>
+          <a href="https://api.baqueanonatales.com/legal/terminos" class="hover:text-emerald-400 transition">Términos</a>
+          <a href="https://api.baqueanonatales.com/legal/eliminar-cuenta" class="hover:text-emerald-400 transition">Eliminar cuenta</a>
+        </div>
+      </div>
+      <div class="max-w-6xl mx-auto text-center mt-4 pt-4 border-t border-slate-900">
+        <p class="font-medium text-slate-400">Diseñado y desarrollado por <span class="text-emerald-400 font-bold">StudioDigital360</span></p>
       </div>
     </footer>
 
