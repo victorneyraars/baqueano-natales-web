@@ -8,8 +8,9 @@
  * - URLs centralizadas para facilitar cambios de entorno.
  */
 
-export const API_URL =
-  import.meta.env.PUBLIC_API_URL || 'https://api.baqueanonatales.com';
+import { PUBLIC_API_URL } from 'astro:env/client';
+
+export const API_URL = PUBLIC_API_URL;
 
 export const API_ENDPOINTS = {
   comercios: `${API_URL}/api/v1/comercios`,
