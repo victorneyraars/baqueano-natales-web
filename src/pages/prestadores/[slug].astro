@@ -7,6 +7,7 @@ import {
   nombreEspecialidad,
   type Review,
 } from '../../config/api';
+import ModalidadesBadges from '../../components/ModalidadesBadges.astro';
 
 export const prerender = false;
 
@@ -143,6 +144,11 @@ const jsonLd = {
             ))}
           </div>
         </section>
+      )}
+
+      <!-- Modalidades (Fase 6) -->
+      {prestador.modalidades && (
+        <ModalidadesBadges modalidades={prestador.modalidades} />
       )}
 
       <!-- Servicios -->

@@ -129,6 +129,43 @@ export interface PrestadorDetalle extends PrestadorListItem {
   redes_sociales: Record<string, string> | null;
   servicios: Servicio[];
   reviews: Review[];
+  modalidades: ModalidadesConfig | null;
+}
+
+
+// ============================================================
+// Modalidades (Fase 6)
+// ============================================================
+export interface ModalidadBase {
+  activo: boolean;
+  notas: string | null;
+}
+
+export interface ModalidadDomicilio extends ModalidadBase {
+  radio_km: number;
+  costo_desplazamiento_clp: number;
+}
+
+export interface ModalidadRecogidaEntrega extends ModalidadBase {
+  costo_traslado_clp: number;
+}
+
+export interface ModalidadSuscripcion extends ModalidadBase {
+  planes: Array<Record<string, unknown>>;
+}
+
+export interface ModalidadPuntoEstrategico extends ModalidadBase {
+  punto_descripcion: string | null;
+}
+
+export interface ModalidadesConfig {
+  taller_fisico: ModalidadBase;
+  domicilio: ModalidadDomicilio;
+  punto_estrategico: ModalidadPuntoEstrategico;
+  recogida_entrega: ModalidadRecogidaEntrega;
+  suscripcion: ModalidadSuscripcion;
+  flotas: ModalidadBase;
+  hibrido: ModalidadBase;
 }
 
 // ============================================================

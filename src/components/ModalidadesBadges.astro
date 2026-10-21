@@ -1,0 +1,65 @@
+---
+// Badges de modalidades de prestación del servicio.
+// Adaptado al tema visual de la web central (emerald/slate).
+// El componente original de se-alquila-marido-web usa clases sam-*
+// definidas en su tailwind.config, por eso no se puede copiar tal cual.
+
+interface Props {
+  modalidades: Record<string, any> | null;
+}
+
+const { modalidades } = Astro.props;
+
+const LABELS: Record<string, { label: string; icono: string }> = {
+  taller_fisico: { label: 'Taller físico', icono: '🏪' },
+  domicilio: { label: 'Servicio a domicilio', icono: '🏠' },
+  punto_estrategico: { label: 'Punto estratégico', icono: '📍' },
+  recogida_entrega: { label: 'Recogida y entrega', icono: '🚚' },
+  suscripcion: { label: 'Suscripción', icono: '💳' },
+  flotas: { label: 'Flotas y empresas', icono: '🏢' },
+  hibrido: { label: 'Híbrido', icono: '🔀' },
+};
+
+const items: Array<{ key: string; label: string; icono: string; detalle?: string }> = [];
+if (modalidades) {
+  for (const [key, value] of Object.entries(modalidades)) {
+    if (!value?.activo) continue;
+    const meta = LABELS[key];
+    if (!meta) continue;
+
+    let detalle: string | undefined;
+    if (key === 'domicilio' && value.radio_km) {
+      detalle = `Hasta ${value.radio_km} km`;
+    }
+    if (key === 'recogida_entrega' && value.costo_traslado_clp) {
+      detalle = `+$${value.costo_traslado_clp.toLocaleString('es-CL')}`;
+    }
+    if (key === 'suscripcion' && Array.isArray(value.planes) && value.planes.length > 0) {
+      detalle = `${value.planes.length} plan${value.planes.length > 1 ? 'es' : ''}`;
+    }
+
+    items.push({ key, label: meta.label, icono: meta.icono, detalle });
+  }
+}
+---
+
+{
+  items.length > 0 && (
+    <section class="mb-6">
+      <h2 class="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
+        Modalidades de atención
+      </h2>
+      <div class="flex flex-wrap gap-2">
+        {items.map((item) => (
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+            <span class="text-sm">{item.icono}</span>
+            <span class="text-xs font-medium text-emerald-300">{item.label}</span>
+            {item.detalle && (
+              <span class="text-[10px] text-slate-400 ml-0.5">({item.detalle})</span>
+            )}
+          </span>
+        ))}
+      </div>
+    </section>
+  )
+}
