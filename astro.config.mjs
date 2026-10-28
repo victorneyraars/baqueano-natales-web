@@ -1,16 +1,17 @@
 import { defineConfig, envField } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
+import cloudflare from '@astrojs/cloudflare';
 
 /**
  * Configuración de Astro para la web central de Baqueano Natales.
- * 
- * - output: 'static' (sitio estático puro, Cloudflare Pages lo sirve desde el edge).
+ *
+ * - output: 'server' permite SSR y la ejecución en el Edge de Cloudflare.
+ * - adapter: cloudflare() genera el output compatible con Pages Functions.
  * - env.schema: variables type-safe inyectadas en build time.
- * - NOTA: La carpeta functions/ se mantiene en la raíz. Cloudflare Pages
- *   la detecta automáticamente para ejecutar lógica en el Edge (ej. descargar.js).
  */
 export default defineConfig({
-  output: 'static',
+  output: 'server',
+  adapter: cloudflare(),
   integrations: [tailwind()],
   env: {
     schema: {
