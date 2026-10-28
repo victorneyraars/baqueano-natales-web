@@ -1,0 +1,17 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: victorneyraars/baqueano-natales/.github/workflows/deploy-astro.yml@561c447c92188162c9a807c5d1a67e68b1fe1ee7
+    with:
+      project-name: baqueano-natales-web
+      environment: production
+      cloudflare-branch: main
+    secrets:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
