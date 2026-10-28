@@ -7,11 +7,13 @@ on:
 
 jobs:
   deploy:
-    uses: victorneyraars/baqueano-natales/.github/workflows/deploy-astro.yml@561c447c92188162c9a807c5d1a67e68b1fe1ee7
+    uses: victorneyraars/baqueano-natales/.github/workflows/deploy-astro.yml@b59ce56cfc91b2a0405dab44327a4563f7e4bec9
     with:
       project-name: baqueano-natales-web
       environment: production
       cloudflare-branch: main
+      build-env: |
+        PUBLIC_API_URL=https://api.baqueanonatales.com
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
